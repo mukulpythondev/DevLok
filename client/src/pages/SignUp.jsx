@@ -1,25 +1,81 @@
-import  { useState } from "react";
+import { useContext, useState } from "react";
+import toast from "react-hot-toast";
+import { AppContext } from "../context/AppContext";
+import { useUpload } from "../hooks/useUpload";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import axiosInstance from "../api/axiosInstance";
 
 const SignUp = () => {
+  const [image, setImage] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-    file: null,
   });
+  const navigate = useNavigate();
+  const { setProgress } = useContext(AppContext);
+
+  const onUploadProgress = (progressEvent) => {
+    const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+    setProgress(progress);
+  };
 
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: name === "file" ? files[0] : value,
+      [name]: value,
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleImage = (e) => {
+    const { files } = e.target;
+    if (files[0].size > 1000000) {
+      toast.error("File size must be less than 1 MB");
+      return;
+    }
+    setImage(files[0]);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission logic here
-    console.log(formData);
+    try {
+      const { email, name, password } = formData;
+      if (name.trim() === "" || email.trim() === "" || password.trim() === "" || image === null) {
+        toast.error("All fields are required.");
+        return;
+      }
+
+      // Image upload process
+      const { public_id, url } = await useUpload({ image, onUploadProgress });
+      if (!public_id || !url) {
+        toast.error("Error when uploading image");
+        return;
+      }
+
+      // Send form data to server
+      const res = await axiosInstance.post("/users/signup", {
+        name,
+        email,
+        password,
+        profile: url,
+         publicId: public_id,
+      });
+
+      const data = res.data;
+      if (data.success) {
+        toast.success(data.message);
+        setImage(null);
+        setFormData({ name: "", password: "", email: "" });
+        navigate("/login");
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error("An error occurred. Please try again.");
+      console.log(error.message);
+    }
   };
 
   return (
@@ -99,7 +155,7 @@ const SignUp = () => {
               id="file"
               name="file"
               accept="image/*"
-              onChange={handleChange}
+              onChange={handleImage}
               className="w-full p-3 bg-black-300 text-black-600 border border-black-500 rounded"
             />
           </div>

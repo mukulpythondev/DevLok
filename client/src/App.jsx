@@ -4,28 +4,57 @@ import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import Chats from "./pages/Chats";
 import Profile from "./pages/Profile";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
+import Layout from "./components/Layout";
+import { AppContextProvider } from "./context/AppContext";
 
 const App = () => {
   return (
-    <>
-      <div className="min-h-screen bg-cover bg-center bg-no-repeat " style={{ backgroundImage: "url('public/home.webp')" }}>
-        <BrowserRouter>
-          <Navbar />
-          <div className="h-screen pt-"> {/* Ensures content doesn't overlap with the fixed navbar and footer */}
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<SignUp />} />
-              <Route path="/chats" element={<Chats />} />
-              <Route path="/profile" element={<Profile />} />
-            </Routes>
-          </div>
-          <Footer />
-        </BrowserRouter>
-      </div>
-    </>
+    <AppContextProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <Layout>
+                <Home />
+              </Layout>
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              <Layout>
+                <Login />
+              </Layout>
+            }
+          />
+          <Route
+            path="/signup"
+            element={
+              <Layout>
+                <SignUp />
+              </Layout>
+            }
+          />
+          <Route
+            path="/chats"
+            element={
+              <Layout>
+                <Chats />
+              </Layout>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <Layout>
+                <Profile />
+              </Layout>
+            }
+          />
+        </Routes>
+      </BrowserRouter>
+    </AppContextProvider>
   );
 };
 
