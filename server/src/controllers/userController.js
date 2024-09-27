@@ -3,6 +3,7 @@ import { User } from "../models/userModel.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js"; // Ensure this is defined correctly
 import jwt from "jsonwebtoken";
+import { sendMail } from "../utils/sendmail.js";
 
 const generateAcesstokenAndRefreshtoken=async (userId)=>{
  try {
@@ -27,7 +28,9 @@ const generateAcesstokenAndRefreshtoken=async (userId)=>{
   throw new ApiError(500,"Server Error: Something went wrong when creating the access token and refresh token")
  }
 }
-
+const generateOTP = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
+};
 const SignUp = async (req, res) => {
   const { name, email, password, profile, publicId } = req.body;
   try {
@@ -43,8 +46,10 @@ const SignUp = async (req, res) => {
     }
 
     // Hash the password
-    const hashedPassword = await hash(password, 10);
-
+    const hashedPassword = await hash(password, 10); 
+    // otp logic 
+    const otp = generateOTP();
+    const otpExpiry = Date.now() + 10 * 60 * 1000;
     // Create new user
     const user = await User.create({
       name,
@@ -52,24 +57,74 @@ const SignUp = async (req, res) => {
       password: hashedPassword,
       profile,
       publicId,
+      otp,
+      otpExpiry,
     });
     // Find the created user without password
-    const createdUser = await User.findById(user._id).select("-password");
+    // const createdUser = await User.findById(user._id).select("-password");
+    // if (!createdUser) {
+    //   throw new ApiError(500, "User could not be created.");
+    // }
+   
+    const createdUser = await User.findById(user._id).select("-password -otp -otpExpiry");
     if (!createdUser) {
       throw new ApiError(500, "User could not be created.");
     }
-
+    await sendMail(user.email, otp)
     // Send success response
-  return  res.status(201).json(new ApiResponse(201, createdUser, "User registered successfully."));
+    return res
+      .status(201)
+      .json(new ApiResponse(201, createdUser, "User registered successfully. Please verify your OTP."));
   } catch (error) {
     // Handle errors
-    res.status(error.status || 500).json({
-      status: error.status || 500,
+    res.status(error.statusCode || 500).json({
+      status: error.statusCode || 500,
       message: error.message || "Something went wrong while creating the user.",
     });
   }
 };
+// OTP verification and token generation
+const verifyOTP = async (req, res) => {
+  const { email, otp } = req.body;
+  try {
+    const user = await User.findOne({email});
 
+    if (!user) {
+      throw new ApiError(404, "User not found.");
+    }
+
+    // Check if OTP is correct and not expired
+    if (user.otp !== otp || user.otpExpiry < Date.now()) {
+      throw new ApiError(400, "Invalid or expired OTP.");
+    }
+
+    // Clear the OTP fields after verification
+    user.otp = undefined;
+    user.otpExpiry = undefined;
+    await user.save();
+
+    // Generate tokens and store them in cookies
+    const { accessToken, refreshToken } = await generateAcesstokenAndRefreshtoken(user._id);
+
+    const options = {
+      httpOnly: true,
+      secure: true,
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    };
+
+    // Store tokens in cookies and return success response
+    return res
+      .status(200)
+      .cookie("accessToken", accessToken, options)
+      .cookie("refreshToken", refreshToken, options)
+      .json(new ApiResponse(200, { accessToken, refreshToken }, "OTP verified, user logged in."));
+  } catch (error) {
+    return res.status(error.statusCode || 500).json({
+      status: error.statusCode || 500,
+      message: error.message || "Something went wrong during OTP verification.",
+    });
+  }
+};
 const Login = async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -92,9 +147,9 @@ const Login = async (req, res) => {
 
       const options = {
           httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite:true,
-          maxAge: 7 * 24 * 60 * 60 * 1000,
+          secure: true,
+          maxAge: 24 * 60 * 60 * 1000,
+          // maxAge: 7 * 24 * 60 * 60 * 1000,
       };
 
       return res
@@ -120,8 +175,7 @@ const Logout= async (req,res)=>{
 } )
 const options= {
   httpOnly:true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "Lax",
+  secure: true,
  }
  return res.status(200).clearCookie("accessToken", options).clearCookie("refreshToken", options).
  json( new ApiResponse(200, {}, "User Logged Out.") )
@@ -145,8 +199,8 @@ const options= {
    }
    const options= {
      httpOnly:true,
-     secure: process.env.NODE_ENV === "production",
-     sameSite: "Lax",
+     secure: true,
+     maxAge: 24 * 60 * 60 * 1000,
     }
     const  {accessToken,newRefreshToken} = await generateAcesstokenAndRefreshtoken(user._id)
     return res.status(200).cookie( "accessToken",accessToken,options).cookie("refreshToken",newRefreshToken,options).json(
@@ -158,21 +212,14 @@ const options= {
  }
  const getUserDetails = async (req, res) => {
   try {
-    const userId = req.user._id; // Assuming the user is set in the request by the verifyJWT middleware
-
-    const user = await User.findById(userId).select("-password -refreshToken"); // Exclude sensitive fields
-    if (!user) {
-      throw new ApiError(404, "User not found.");
-    }
-
-    return res.status(200).json(new ApiResponse(200, user, "User details retrieved successfully."));
+   
+    return res.status(200).json(new ApiResponse(200, req?.user, "User details retrieved successfully."));
   } catch (error) {
-    return res.status(error.status || 500).json({
-      status: error.status || 500,
+    return res.status(error.statusCode || 500).json({
+      status: error.statusCode || 500,
       message: error.message || "Something went wrong while fetching user details.",
     });
   }
 };
 
-
-export { SignUp, Login,Logout,RefreshAccessToken,getUserDetails };
+export { SignUp, Login,Logout,RefreshAccessToken,getUserDetails, verifyOTP };

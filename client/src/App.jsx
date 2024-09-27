@@ -6,6 +6,7 @@ import Chats from "./pages/Chats";
 import Profile from "./pages/Profile";
 import Layout from "./components/Layout";
 import { AppContextProvider } from "./context/AppContext";
+import VerifyOtp from "./components/VerifyOTP";
 
 const App = () => {
   return (
@@ -52,7 +53,16 @@ const App = () => {
               </Layout>
             }
           />
+          <Route
+            path="/verify-otp"
+            element={
+              <Layout>
+                <VerifyOtp/>
+              </Layout>
+            }
+          />
         </Routes>
+        
       </BrowserRouter>
     </AppContextProvider>
   );

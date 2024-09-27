@@ -1,19 +1,30 @@
 import { useContext, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
+import axiosInstance from "../api/axiosInstance";
+import toast from "react-hot-toast";
 
 const Navbar = () => {
   const location = useLocation();
-  const { user } = useContext(AppContext); // Assuming you have a logout function in context
+  const { user,setUser } = useContext(AppContext); // Assuming you have a logout function in context
   const [dropdownOpen, setDropdownOpen] = useState(false);
   //  console.log(user)
+  const navigate= useNavigate()
   const toggleDropdown = () => {
     setDropdownOpen((prev) => !prev);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async() => {
     // logout(); // Call logout function from context
-    setDropdownOpen(false);
+    try {
+          await axiosInstance.post("/users/logout")
+          setUser(null)
+          setDropdownOpen(false)
+          toast.success("Logout successfully")
+          navigate("/login"); 
+    } catch (error) {
+     console.error("Error during logout", error) 
+    }
   };
 
   return (

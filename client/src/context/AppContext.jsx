@@ -12,30 +12,20 @@ export const AppContextProvider = ({ children }) => {
 
     // Function to fetch user details if needed
     const fetchUserDetails = async () => {
-        const accessToken = Cookies.get('accessToken'); // Get the access token cookie
-        if (!accessToken) {
-            console.log("No access token found. User is not logged in.");
-            return; // Exit if no token
-        }
-
         try {
-            const response = await axiosInstance.get("users/user/details", {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`, // Include the token in the header
-                },
-            });
-            setUser(response.data.data.user); // Set user details
+            const response = await axiosInstance.get("users/user/details");
+            setUser(response.data.data); // Set user details
         } catch (error) {
-            console.error("Failed to fetch user details:", error);
+            console.log("Failed to fetch user details:", error);
+            setUser(null)
             // Optionally handle errors (e.g., clear user state or redirect)
         }
     };
-
+    
     // Check for stored cookies and fetch user details on initial load
     useEffect(() => {
         fetchUserDetails(); // Call fetchUserDetails directly
     }, []);
-
     return (
         <AppContext.Provider value={{ progress, setProgress, user, setUser }}>
             <>

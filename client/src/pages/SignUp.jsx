@@ -14,7 +14,7 @@ const SignUp = () => {
     password: "",
   });
   const navigate = useNavigate();
-  const { setProgress } = useContext(AppContext);
+  const { setProgress,setUser } = useContext(AppContext);
 
   const onUploadProgress = (progressEvent) => {
     const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
@@ -68,13 +68,25 @@ const SignUp = () => {
         toast.success(data.message);
         setImage(null);
         setFormData({ name: "", password: "", email: "" });
-        navigate("/login");
+        setUser(data?.data)
+        console.log(data)
+        navigate("/verify-otp");
       } else {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error("An error occurred. Please try again.");
-      console.log(error.message);
+       if (error.response) {
+        const status = error.response.status;
+        const message = error.response.data.message || "An error occurred during signup.";
+        
+        if (status === 400) {
+          toast.error(message); // Display server message for existing email
+        } else {
+          toast.error("An unexpected error occurred.");
+        }
+      } else {
+        toast.error("An error occurred during signup.");
+      }
     }
   };
 
