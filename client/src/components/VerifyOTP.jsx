@@ -44,7 +44,7 @@ const VerifyOtp = () => {
 
       if (res.data.success) {
         toast.success("OTP verified successfully");
-        navigate("/profile"); // Navigate to the next page after verification
+        navigate("/login"); // Navigate to the next page after verification
       } else {
         toast.error("Invalid OTP. Please try again.");
       }

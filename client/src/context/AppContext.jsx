@@ -8,7 +8,8 @@ export const AppContext = createContext();
 
 export const AppContextProvider = ({ children }) => {
     const [progress, setProgress] = useState(0);
-    const [user, setUser] = useState(null); // Use null instead of an array for user
+    const [user, setUser] = useState(null); // current users
+    const [users,setUsers] = useState(null)  // all users
 
     // Function to fetch user details if needed
     const fetchUserDetails = async () => {
@@ -27,7 +28,7 @@ export const AppContextProvider = ({ children }) => {
         fetchUserDetails(); // Call fetchUserDetails directly
     }, []);
     return (
-        <AppContext.Provider value={{ progress, setProgress, user, setUser }}>
+        <AppContext.Provider value={{ progress, setProgress, user, setUser , users , setUsers}}>
             <>
                 <Toaster />
                 <LoadingBar height={3} color="black" />

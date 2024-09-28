@@ -221,5 +221,56 @@ const options= {
     });
   }
 };
+const getAllUserDetails= async (req,res) =>{
+  try {
+    const allUsers= await  User.find().select("-password -refreshToken")
+    return res.status(200).json(new ApiResponse(200, allUsers, "All users fetched successfully"))
+    
+  } catch (error) {
+    return res.status(error.statusCode || 500).json({
+      status: error.statusCode || 500,
+      message: error.message || "Something went wrong during fetching all users.",
+    });
+  }
+}
+const updateUserAction = async (req, res) => {
+  try {
+    const { id } = req.params; // User ID to add to favourites/dislikes
+    const { actionType } = req.body; // Action type can be 'favourite' or 'dislike'
+    const userId = req.user._id; // Assuming you have user ID from authentication (JWT)
 
-export { SignUp, Login,Logout,RefreshAccessToken,getUserDetails, verifyOTP };
+    // Find the current user
+    const user = await User.findById(userId);
+
+    if (!user) {
+      throw new ApiError(404, "User not found");
+    }
+
+    // Handle action based on actionType
+    if (actionType === "favourite") {
+      // Check if user is already in favourites
+      if (!user.favourites.includes(id)) {
+        user.favourites.push(id);
+        await user.save();
+        return res.status(200).json(new ApiResponse(200, user, "User added to favourites"));
+      } else {
+        return res.status(400).json(new ApiResponse(400, {}, "User already added to favourites."));
+      }
+    } else if (actionType === "dislike") {
+      // Check if user is already in dislikes
+      if (!user.disliked.includes(id)) {
+        user.disliked.push(id);
+        await user.save();
+        return res.status(200).json(new ApiResponse(200, user, "User added to dislikes"));
+      } else {
+        return res.status(400).json(new ApiResponse(400, {}, "User already added to dislikes."));
+      }
+    } else {
+      return res.status(400).json(new ApiResponse(400, {}, "Invalid action type"));
+    }
+  } catch (error) {
+    return res.status(500).json(new ApiResponse(500, {}, "Internal server error while updating user action"));
+  }
+};
+
+export { SignUp, Login,Logout,RefreshAccessToken,getUserDetails, verifyOTP , getAllUserDetails , updateUserAction};
