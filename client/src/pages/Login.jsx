@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../api/axiosInstance";
 import { AppContext } from "../context/AppContext";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Login = () => {
   const {setUser,setProgress}= useContext(AppContext)
@@ -10,9 +11,12 @@ const Login = () => {
     email: "",
     password: "",
   });
-  
-  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false); // State to manage password visibility
 
+  const navigate = useNavigate();
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -43,7 +47,7 @@ const Login = () => {
         setUser(data?.data?.user);
         console.log(data?.accessToken)
         setProgress(100);
-        navigate("/profile"); // Redirect after successful login
+        navigate("/new"); // Redirect after successful login
       } else {
         toast.error("Invalid Credentials" || data.message);
       }
@@ -94,7 +98,7 @@ const Login = () => {
           </div>
 
           {/* Password Field */}
-          <div>
+          <div className="relative">
             <label
               htmlFor="password"
               className="block text-black-700 font-ropaOne mb-2"
@@ -102,7 +106,7 @@ const Login = () => {
               Password
             </label>
             <input
-              type="password"
+              type={showPassword? "password":"text"}
               id="password"
               name="password"
               value={formData.password}
@@ -110,6 +114,14 @@ const Login = () => {
               placeholder="Enter your password"
               className="w-full p-3 bg-black-300 text-black-800 placeholder-black-600 border border-black-500 focus:ring-rose-500 focus:border-rose-500 rounded"
             />
+                 <button
+        type="button"
+        onClick={togglePasswordVisibility}
+        className="absolute text-xl inset-y-0 right-3 top-7 flex items-center text-zinc-400 focus:outline-none"
+      >
+        {showPassword ? <FaEyeSlash /> : <FaEye />} {/* Show different icons based on state */}
+
+      </button>
           </div>
 
           {/* Login Button */}

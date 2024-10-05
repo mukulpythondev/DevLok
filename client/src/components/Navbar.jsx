@@ -3,28 +3,33 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 import axiosInstance from "../api/axiosInstance";
 import toast from "react-hot-toast";
+import { FaUserCircle, FaChevronDown } from "react-icons/fa"; // Import react-icons for user and dropdown icon
 
 const Navbar = () => {
   const location = useLocation();
-  const { user,setUser } = useContext(AppContext); // Assuming you have a logout function in context
+  const { user, setUser } = useContext(AppContext);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  //  console.log(user)
-  const navigate= useNavigate()
+  const navigate = useNavigate();
+
   const toggleDropdown = () => {
     setDropdownOpen((prev) => !prev);
   };
 
-  const handleLogout = async() => {
-    // logout(); // Call logout function from context
+  const handleLogout = async () => {
     try {
-          await axiosInstance.post("/users/logout")
-          setUser(null)
-          setDropdownOpen(false)
-          toast.success("Logout successfully")
-          navigate("/login"); 
+      await axiosInstance.post("/users/logout");
+      setUser(null);
+      setDropdownOpen(false);
+      toast.success("Logout successfully");
+      navigate("/login");
     } catch (error) {
-     console.error("Error during logout", error) 
+      console.error("Error during logout", error);
     }
+  };
+
+  // Close the dropdown when mouse leaves the dropdown menu
+  const closeDropdown = () => {
+    setDropdownOpen(false);
   };
 
   return (
@@ -36,7 +41,7 @@ const Navbar = () => {
           </h2>
         </Link>
         {user ? (
-          <div className="hidden w-full md:block md:w-auto relative">
+          <div className="relative hidden w-full md:block md:w-auto">
             <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border rounded-lg md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0">
               <li>
                 <Link to={"/new"} className="block py-2 px-3 md:hover:text-rose-600 text-xl text-white rounded md:bg-transparent">
@@ -44,29 +49,34 @@ const Navbar = () => {
                 </Link>
               </li>
               <li className="relative">
-                <button onClick={toggleDropdown} className="block py-2 px-3 md:hover:text-rose-600 text-xl text-white rounded md:bg-transparent">
-                  {user?.name}
+                <button onClick={toggleDropdown} className="flex items-center space-x-2 py-2 px-3 md:hover:text-rose-600 text-xl text-white rounded md:bg-transparent">
+                  {user?.profile ? (
+                    <img src={user.profile} alt="User" className="w-10 h-10 rounded-full" />
+                  ) : (
+                    <FaUserCircle className="text-2xl" />
+                  )}
+                  <FaChevronDown className="text-sm" />
                 </button>
                 {dropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
+                  <div className="absolute right-0 mt-2 w-48 bg-black-200 rounded-md shadow-lg z-10" onMouseLeave={closeDropdown}>
                     <ul className="py-2">
                       <li>
-                        <Link to={"/chats"} className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+                        <Link to={"/chats"} className="block px-4 py-2 text-white  hover:text-rose-500">
                           Chats
                         </Link>
                       </li>
                       <li>
-                        <Link to={"/friends"} className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+                        <Link to={"/friends"} className="block px-4 py-2 text-white hover:text-rose-500">
                           Friends
                         </Link>
                       </li>
                       <li>
-                        <Link to={"/profile"} className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+                        <Link to={"/profile"} className="block px-4 py-2 text-white hover:text-rose-500">
                           Profile
                         </Link>
                       </li>
                       <li>
-                        <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-200">
+                        <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-white hover:text-rose-500">
                           Logout
                         </button>
                       </li>

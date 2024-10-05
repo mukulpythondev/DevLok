@@ -13,7 +13,7 @@ const Home = () => {
         In Devlok, relationships are like responsive design – adaptable and made to fit perfectly, no matter the screen size.
       </p>
       <Link
-        to="/signup"
+        to="/chats"
         className="relative overflow-hidden inline-flex group items-center justify-center px-6 py-3 mt-8 cursor-pointer border-b-4 border-l-2 border-rose-700 active:border-rose-600 active:shadow-none shadow-lg bg-gradient-to-tr from-rose-600 to-rose-500 text-white font-bold text-lg rounded-full"
       >
         <span className="absolute w-0 h-0 transition-all duration-300 ease-out bg-white rounded-full group-hover:w-40 group-hover:h-40 opacity-10"></span>

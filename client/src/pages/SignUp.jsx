@@ -5,6 +5,7 @@ import { useUpload } from "../hooks/useUpload";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../api/axiosInstance";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const SignUp = () => {
   const [image, setImage] = useState(null);
@@ -13,12 +14,13 @@ const SignUp = () => {
     email: "",
     password: "",
   });
-  const navigate = useNavigate();
-  const { setProgress,setUser } = useContext(AppContext);
+  const [showPassword, setShowPassword] = useState(false); // State to manage password visibility
 
-  const onUploadProgress = (progressEvent) => {
-    const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-    setProgress(progress);
+  const { setUser,setOtpRequested } = useContext(AppContext);
+  const navigate = useNavigate();
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
   };
 
   const handleChange = (e) => {
@@ -69,7 +71,7 @@ const SignUp = () => {
         setImage(null);
         setFormData({ name: "", password: "", email: "" });
         setUser(data?.data)
-        console.log(data)
+         setOtpRequested(true)
         navigate("/verify-otp");
       } else {
         toast.error(data.message);
@@ -136,7 +138,7 @@ const SignUp = () => {
           </div>
 
           {/* Password Field */}
-          <div>
+          <div className="relative" >
             <label
               htmlFor="password"
               className="block text-black-700 font-ropaOne mb-2"
@@ -144,7 +146,7 @@ const SignUp = () => {
               Password
             </label>
             <input
-              type="password"
+              type={showPassword ? "password" : "text"}
               id="password"
               name="password"
               value={formData.password}
@@ -152,6 +154,13 @@ const SignUp = () => {
               placeholder="Enter your password"
               className="w-full p-3 bg-black-300 text-black-800 placeholder-black-600 border border-black-500 focus:ring-rose-500 focus:border-rose-500 rounded"
             />
+              <button
+        type="button"
+        onClick={togglePasswordVisibility}
+        className="absolute text-xl inset-y-0 right-3 top-7 flex items-center text-zinc-400 focus:outline-none"
+      >
+        {showPassword ? <FaEyeSlash /> : <FaEye />} {/* Show different icons based on state */}
+      </button>
           </div>
 
           {/* File Upload Field */}

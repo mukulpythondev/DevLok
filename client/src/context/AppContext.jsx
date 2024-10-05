@@ -1,16 +1,14 @@
 import React, { createContext, useState, useEffect } from "react";
 import { Toaster } from "react-hot-toast";
-import LoadingBar from "react-top-loading-bar";
 import axiosInstance from "../api/axiosInstance"; // Ensure this imports your axios instance
-import Cookies from "js-cookie"; // Import js-cookie
 
 export const AppContext = createContext();
 
 export const AppContextProvider = ({ children }) => {
-    const [progress, setProgress] = useState(0);
+    const [loading, setLoading] = useState(true);
     const [user, setUser] = useState(null); // current users
     const [users,setUsers] = useState(null)  // all users
-
+    const [otpRequested, setOtpRequested] = useState(false);
     // Function to fetch user details if needed
     const fetchUserDetails = async () => {
         try {
@@ -21,6 +19,9 @@ export const AppContextProvider = ({ children }) => {
             setUser(null)
             // Optionally handle errors (e.g., clear user state or redirect)
         }
+        finally{
+            setLoading(false)
+        }
     };
     
     // Check for stored cookies and fetch user details on initial load
@@ -28,10 +29,9 @@ export const AppContextProvider = ({ children }) => {
         fetchUserDetails(); // Call fetchUserDetails directly
     }, []);
     return (
-        <AppContext.Provider value={{ progress, setProgress, user, setUser , users , setUsers}}>
+        <AppContext.Provider value={{ loading, setLoading, user, setUser , users , setUsers, otpRequested, setOtpRequested}}>
             <>
                 <Toaster />
-                <LoadingBar height={3} color="black" />
                 {children}
             </>
         </AppContext.Provider>

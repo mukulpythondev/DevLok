@@ -237,7 +237,7 @@ const updateUserAction = async (req, res) => {
   try {
     const { id } = req.params; // User ID to add to favourites/dislikes
     const { actionType } = req.body; // Action type can be 'favourite' or 'dislike'
-    const userId = req.user._id; // Assuming you have user ID from authentication (JWT)
+    const userId = req.user._id; 
 
     // Find the current user
     const user = await User.findById(userId);
@@ -272,5 +272,25 @@ const updateUserAction = async (req, res) => {
     return res.status(500).json(new ApiResponse(500, {}, "Internal server error while updating user action"));
   }
 };
+const getFavourites = async (req, res) => {
+  try {
+    const userId = req.user._id; // Get the logged-in user's ID
 
-export { SignUp, Login,Logout,RefreshAccessToken,getUserDetails, verifyOTP , getAllUserDetails , updateUserAction};
+    // Find the user by ID and populate the favourites field to get user details
+    const user = await User.findById(userId).populate('favourites', '-password -refreshToken'); // Exclude sensitive fields like password and refreshToken
+
+    if (!user) {
+      throw new ApiError(404, "User not found");
+    }
+
+    // Return the list of favourites
+    return res.status(200).json(new ApiResponse(200, user.favourites, "Favourites retrieved successfully."));
+  } catch (error) {
+    return res.status(error.statusCode || 500).json({
+      status: error.statusCode || 500,
+      message: error.message || "Something went wrong while fetching favourites.",
+    });
+  }
+};
+
+export { SignUp, Login,Logout,RefreshAccessToken,getUserDetails, verifyOTP , getAllUserDetails , updateUserAction,getFavourites};
