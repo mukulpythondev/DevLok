@@ -1,10 +1,10 @@
 import { Navigate } from 'react-router-dom';
-import { useContext } from 'react';
-import { AppContext } from '../context/AppContext';
+
 import Loader from './Loader'; // Assuming you have a loader component
+import { useAuth } from '../context/AppContext';
 
 const ProtectedRoute = ({ element, requiresOtp = false }) => {
-  const { user, otpRequested, loading } = useContext(AppContext);
+  const { user, otpRequested, loading } = useAuth();
 
   // Show loader while fetching user data
   if (loading) {

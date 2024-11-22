@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const Footer = () => {
   return (
     <footer className="fixed bottom-0 backdrop-blur-md w-full border-t-2 border-black-500 p-6">
@@ -11,21 +13,21 @@ const Footer = () => {
 
           <ul className="flex space-x-6 text-white text-xl font-medium">
             <li>
-              <a href="#" className="hover:text-rose-600 transition-all duration-200">About</a>
+              <Link  to={"/about"} className="hover:text-rose-600 transition-all duration-200">About</Link>
             </li>
             <li>
-              <a href="#" className="hover:text-rose-600 transition-all duration-200">Safety</a>
+              <Link to={"/safety"} className="hover:text-rose-600 transition-all duration-200">Safety</Link>
             </li>
-            <li>
+            {/* <li>
               <a href="#" className="hover:text-rose-600 transition-all duration-200">Contact</a>
-            </li>
+            </li> */}
           </ul>
         </div>
 
         <hr className="my-6 border-black-500" />
         
         <div className="text-center">
-          <span className="block text-sm text-black-600">© 2023 DevLok. All Rights Reserved.</span>
+          <span className="block text-sm text-black-600">© { new Date().getFullYear()} DevLok. All Rights Reserved.</span>
         </div>
       </div>
     </footer>

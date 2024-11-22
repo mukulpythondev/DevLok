@@ -8,10 +8,14 @@ import { AppContextProvider } from "./context/AppContext";
 import VerifyOtp from "./components/VerifyOTP";
 import New from "./pages/New";
 import ProtectedRoute from "./components/ProtectedRoute"; // Now handles both OTP and auth protection
+import About from "./pages/About";
+import Safety from "./pages/Safety";
+import { SocketProvider } from "./context/SocketContext";
 
 const App = () => {
   return (
     <AppContextProvider>
+      <SocketProvider>
       <BrowserRouter>
         <Routes>
           <Route
@@ -19,6 +23,22 @@ const App = () => {
             element={
               <Layout>
                 <Home />
+              </Layout>
+            }
+          />
+           <Route
+            path="/about"
+            element={
+              <Layout>
+                <About />
+              </Layout>
+            }
+          />
+           <Route
+            path="/safety"
+            element={
+              <Layout>
+                <Safety />
               </Layout>
             }
           />
@@ -77,6 +97,7 @@ const App = () => {
           />
         </Routes>
       </BrowserRouter>
+      </SocketProvider>
     </AppContextProvider>
   );
 };

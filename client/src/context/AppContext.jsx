@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, useContext } from "react";
 import { Toaster } from "react-hot-toast";
 import axiosInstance from "../api/axiosInstance"; // Ensure this imports your axios instance
 
@@ -37,3 +37,4 @@ export const AppContextProvider = ({ children }) => {
         </AppContext.Provider>
     );
 };
+export const useAuth = () => useContext(AppContext);

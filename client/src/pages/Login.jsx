@@ -6,7 +6,7 @@ import { AppContext } from "../context/AppContext";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Login = () => {
-  const {setUser,setProgress}= useContext(AppContext)
+  const {setUser}= useContext(AppContext)
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -26,7 +26,6 @@ const Login = () => {
   };
 
   const handleSubmit = async (e) => {
-    setProgress(0);
     e.preventDefault();
     try {
       const { email, password } = formData;
@@ -45,8 +44,6 @@ const Login = () => {
         toast.success(data.message);
         setFormData({ email: "", password: "" });
         setUser(data?.data?.user);
-        console.log(data?.accessToken)
-        setProgress(100);
         navigate("/new"); // Redirect after successful login
       } else {
         toast.error("Invalid Credentials" || data.message);
