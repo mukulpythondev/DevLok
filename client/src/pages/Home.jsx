@@ -4,12 +4,12 @@ const Home = () => {
   return (
     <div
       style={{ backgroundImage: "url('public/home.webp')" }}
-      className="flex h-screen items-center justify-center flex-col"
+      className="flex h-screen items-center justify-center flex-col bg-cover bg-center px-4"
     >
-      <h1 className="text-5xl text-center w-1/2 leading-snug text-white">
+      <h1 className="text-4xl sm:text-5xl text-center w-full sm:w-3/4 md:w-1/2 leading-snug text-white">
         Match with Someone Who <span className="text-rose-500">Loves</span> Dark Mode..
       </h1>
-      <p className="text-black-700 text-center mt-4 text-xl w-1/2">
+      <p className="text-gray-300 text-center mt-4 text-lg sm:text-xl w-full sm:w-3/4 md:w-1/2">
         In Devlok, relationships are like responsive design – adaptable and made to fit perfectly, no matter the screen size.
       </p>
       <Link

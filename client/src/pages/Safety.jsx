@@ -1,38 +1,36 @@
-
+import React from 'react';
 
 const Safety = () => {
   return (
-    <div className="flex items-start justify-center flex-col bg-black-100 h-screen w-full px-10">
-      <h1 className="text-4xl font-bold text-zinc-200 mb-4">Safety Guidelines</h1>
+    <div className="flex flex-col items-start bg-black-100 w-full px-4 py-10 md:px-20 lg:px-36 h-[100vh] md:h-[83vh] overflow-y-auto pt-24">
+      <h1 className="text-3xl md:text-4xl font-bold text-zinc-200 mb-6">Safety Guidelines</h1>
       <p className="text-gray-300 mb-6">
-        DevLok Chat is committed to providing a secure and private communication platform. 
-        Here are some guidelines to help you stay safe and secure while using this service.
+        DevLok Chat ensures your communication is private and secure. Follow these guidelines for a safe experience.
       </p>
 
-      <h2 className="text-2xl font-semibold text-zinc-200 mb-2">Safety Tips</h2>
+      <h2 className="text-2xl md:text-3xl font-semibold text-zinc-200 mb-4">Safety Tips</h2>
       <ul className="list-disc list-inside text-gray-300 mb-6">
-        <li>Keep your personal information private. Avoid sharing sensitive details with unknown contacts.</li>
-        <li>Be cautious with links. Only click on links from trusted sources, and never share personal information on untrusted websites.</li>
-        <li>Report suspicious activity. If you encounter any suspicious behavior, report it immediately.</li>
-        <li>Keep your software updated. Ensure you’re using the latest version of the chat app to benefit from security updates.</li>
+        <li>Keep personal information private.</li>
+        <li>Be cautious with links—only click from trusted sources.</li>
+        <li>Report suspicious activity immediately.</li>
+        <li>Update to the latest version for enhanced security.</li>
       </ul>
 
-      <h2 className="text-2xl font-semibold text-zinc-200 mb-2">Using DevLok Chat Securely</h2>
+      <h2 className="text-2xl md:text-3xl font-semibold text-zinc-200 mb-4">Secure Communication</h2>
       <p className="text-gray-300 mb-6">
-        This chat platform uses end-to-end encryption for your messages, protecting your data from unauthorized access. 
-        Always remember to log out of your account on shared devices to prevent unauthorized access.
+        DevLok uses server-side encryption to protect your messages. Always log out on shared devices.
       </p>
 
-      <h2 className="text-2xl font-semibold text-zinc-200 mb-2">Community Guidelines</h2>
+      <h2 className="text-2xl md:text-3xl font-semibold text-zinc-200 mb-4">Community Guidelines</h2>
       <ul className="list-disc list-inside text-gray-300 mb-6">
-        <li>Be respectful and courteous in all interactions.</li>
-        <li>Avoid inappropriate or offensive language.</li>
-        <li>Respect the privacy and boundaries of others.</li>
+        <li>Be respectful and courteous to others.</li>
+        <li>Avoid offensive language or behavior.</li>
+        <li>Respect others' privacy and boundaries.</li>
       </ul>
 
-      <h2 className="text-2xl font-semibold text-zinc-200 mb-2">Need Help?</h2>
+      <h2 className="text-2xl md:text-3xl font-semibold text-zinc-200 mb-4">Need Help?</h2>
       <p className="text-gray-300">
-        If you need any assistance, feel free to reach out to our support team. Stay safe and enjoy your experience on DevLok Chat!
+        Contact our support team for assistance. Stay safe and enjoy using DevLok Chat!
       </p>
     </div>
   );

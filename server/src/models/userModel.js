@@ -34,10 +34,21 @@ const userSchema= new Schema({
             ref:"User"
         }
     ],
+    linkedinUrl: {
+        type:String
+    },
     refreshToken:{
         type:String,
         
     },
+    bio:{
+        type:String,
+        maxlength:50
+    },
+    publicKey: {
+        n: { type: String, required: true }, // RSA Modulus (n)
+        e: { type: String, required: true }  // RSA Exponent (e)
+      },
     otp: { type: String }, 
      otpExpiresAt: { type: Date },
      isVerified: {

@@ -3,23 +3,31 @@ import http from "http";
 import app from "../app.js";
 import { createAdapter } from "@socket.io/redis-streams-adapter";
 import Redis from "ioredis";
+import dotenv from 'dotenv'
+dotenv.config()
+// Environment-Specific Redis Configuration
+const isProduction =  process.env.NODE_ENV === "production";
 
-// Redis Configuration
-const redisServerConfig = {
-  host: "localhost",
-  port: 6379,
-};
+const redisConfig = isProduction
+  ? {
+      url: `rediss://default:${process.env.UPSTASH_PASSWORD}@${process.env.UPSTASH_ENDPOINT}:${process.env.UPSTASH_PORT}`,
+    }
+  : {
+      host: "localhost",
+      port: 6379,
+    };
 
 // Redis Clients
-const pubClient = new Redis(redisServerConfig); // For Pub/Sub
-const subClient = pubClient.duplicate();        // Duplicate for Subscribing
-const onlineUsersClient = pubClient.duplicate(); // For tracking online users
+const client = new Redis(redisConfig.url || redisConfig);
+const pubClient = client.duplicate(); // For Pub/Sub
+const subClient = client.duplicate(); // For Subscribing
+const onlineUsersClient = client.duplicate(); // For tracking online users
 
 // HTTP Server and Socket.IO Initialization
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", // Update to match your frontend URL
+    origin: `${process.env.FRONTEND_URL}`, // Update to match your frontend URL
     methods: ["GET", "POST"],
     credentials: true,
   },

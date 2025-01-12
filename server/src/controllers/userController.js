@@ -32,57 +32,53 @@ const generateOTP = () => {
   return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
 };
 const SignUp = async (req, res) => {
-  const { name, email, password, profile, publicId } = req.body;
+  const { name, email, password, profile, publicId, publicKey,bio , linkedinUrl} = req.body;
+  const { n, e } = publicKey;
   try {
-    // Check for required fields
-    if (!name?.trim().length || !email?.trim().length || !password?.trim().length || !profile?.trim().length || !publicId?.trim().length) {
-      throw new ApiError(400, "All Fields are required.");
+    if (!name?.trim() || !email?.trim() || !password?.trim() || !profile?.trim() || !publicId?.trim() || !bio.trim()) {
+      throw new ApiError(400, "All fields are required.");
     }
 
-    // Check if user already exists
-    const existedUser = await User.findOne({email});
+    if (!publicKey) {
+      throw new ApiError(400, "Public key is required.");
+    }
+
+    const existedUser = await User.findOne({ email });
     if (existedUser) {
-      throw new ApiError(400, "User Already Exists.");
+      throw new ApiError(400, "User already exists.");
     }
 
-    // Hash the password
-    const hashedPassword = await hash(password, 10); 
-    // otp logic 
+    const hashedPassword = await hash(password, 10);
     const otp = generateOTP();
     const otpExpiry = Date.now() + 10 * 60 * 1000;
-    // Create new user
+
     const user = await User.create({
       name,
       email,
       password: hashedPassword,
       profile,
       publicId,
+      publicKey: {n,e},
       otp,
       otpExpiry,
+      bio,
+      linkedinUrl
     });
-    // Find the created user without password
-    // const createdUser = await User.findById(user._id).select("-password");
-    // if (!createdUser) {
-    //   throw new ApiError(500, "User could not be created.");
-    // }
-   
+
     const createdUser = await User.findById(user._id).select("-password -otp -otpExpiry");
-    if (!createdUser) {
-      throw new ApiError(500, "User could not be created.");
-    }
-    await sendMail(user.email, otp)
-    // Send success response
+    await sendMail(user.email, otp);
+
     return res
       .status(201)
       .json(new ApiResponse(201, createdUser, "User registered successfully. Please verify your OTP."));
   } catch (error) {
-    // Handle errors
     res.status(error.statusCode || 500).json({
       status: error.statusCode || 500,
       message: error.message || "Something went wrong while creating the user.",
     });
   }
 };
+
 // OTP verification and token generation
 const verifyOTP = async (req, res) => {
   const { email, otp } = req.body;
@@ -292,5 +288,68 @@ const getFavourites = async (req, res) => {
     });
   }
 };
+export const getUserPublicKey = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select("publicKey");
+    if (!user) {
+      return res.status(404).json(new ApiResponse(404, {}, "User not found"));
+    }
+    res.status(200).json(new ApiResponse(200, { publicKey: user.publicKey }, "Public key feteched successfully."));
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch public key" });
+  }
+};
+export const updateUserPublicKey = async (req, res) => {
+  try {
+    const { publicKey } = req.body;
 
-export { SignUp, Login,Logout,RefreshAccessToken,getUserDetails, verifyOTP , getAllUserDetails , updateUserAction,getFavourites};
+    if (!publicKey) {
+      return res.status(400).json(new ApiResponse(400, {}, "Public key is required."));
+    }
+
+    const user = await User.findByIdAndUpdate(req.user._id, { publicKey }, { new: true });
+    if (!user) {
+      return res.status(404).json(new ApiResponse(404, {}, "User not found"));
+    }
+    res.status(200).json(new ApiResponse(200, {}, "Public key updated successfully."));
+  } catch (error) {
+    res.status(500).json(new ApiResponse(500, {}, "Failed to update the public key."));
+  }
+};
+
+
+const updateProfile = async (req, res) => {
+  const { name, bio, linkedinUrl, profile, publicId } = req.body;
+  const userId = req.user._id;
+
+  try {
+    // Find the user by ID
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new ApiError(404, "User not found.");
+    }
+
+    // Update the user's profile information
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        name: name ?? user.name, // Update name if provided
+        bio: bio ?? user.bio, // Update bio if provided
+        linkedinUrl: linkedinUrl ?? user.linkedinUrl, // Update linkedinUrl if provided
+        profile: profile ?? user.profile, // Update profile image URL if provided
+        publicId: publicId ?? user.publicId, // Update profile image public ID if provided
+      },
+      { new: true }
+    ).select("-password -otp -otpExpiry"); // Exclude sensitive data from the response
+
+    return res.status(200).json(new ApiResponse(200, updatedUser, "Profile updated successfully."));
+  } catch (error) {
+    return res.status(error.statusCode || 500).json({
+      status: error.statusCode || 500,
+      message: error.message || "Something went wrong while updating the profile.",
+    });
+  }
+};
+
+
+export { SignUp,updateProfile, Login,Logout,RefreshAccessToken,getUserDetails, verifyOTP , getAllUserDetails , updateUserAction,getFavourites};

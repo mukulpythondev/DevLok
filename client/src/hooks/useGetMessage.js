@@ -1,10 +1,9 @@
-import  { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axiosInstance from "../api/axiosInstance";
 import useConversation from "../state/useConversion";
 const useGetMessage = () => {
   const [loading, setLoading] = useState(false);
-  const { messages, setMessage, selectedConversation } = useConversation();
-
+  const { messages, setMessage, selectedConversation } = useConversation(); 
   useEffect(() => {
     const getMessages = async () => {
       setLoading(true);
@@ -13,16 +12,20 @@ const useGetMessage = () => {
           const res = await axiosInstance.get(
             `users/message/get/${selectedConversation._id}`
           );
+
           setMessage(res.data);
-          setLoading(false);
         } catch (error) {
-          console.log("Error in getting messages", error);
+          console.error("Error in getting messages:", error);
+        } finally {
           setLoading(false);
         }
+      } else {
+        setLoading(false);
       }
     };
     getMessages();
   }, [selectedConversation, setMessage]);
+
   return { loading, messages };
 };
 

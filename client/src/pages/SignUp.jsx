@@ -1,11 +1,11 @@
 import { useContext, useState } from "react";
 import toast from "react-hot-toast";
 import { AppContext } from "../context/AppContext";
-import { useUpload } from "../hooks/useUpload";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import axiosInstance from "../api/axiosInstance";
+import { useNavigate } from "react-router-dom";
+import { generateKeyPair } from "../utils/cryptoUtils"; // Import the utility function
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useUpload } from "../hooks/useUpload";
 
 const SignUp = () => {
   const [image, setImage] = useState(null);
@@ -13,10 +13,12 @@ const SignUp = () => {
     name: "",
     email: "",
     password: "",
+    linkedinUrl: "", // LinkedIn URL field
+    bio: "", // Bio field
   });
   const [showPassword, setShowPassword] = useState(false); // State to manage password visibility
 
-  const { setUser,setOtpRequested } = useContext(AppContext);
+  const { setUser, setOtpRequested } = useContext(AppContext);
   const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
@@ -43,41 +45,58 @@ const SignUp = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { email, name, password } = formData;
-      if (name.trim() === "" || email.trim() === "" || password.trim() === "" || image === null) {
+      const { email, name, password, linkedinUrl, bio } = formData;
+      if (
+        name.trim() === "" ||
+        email.trim() === "" ||
+        password.trim() === "" ||
+        image === null ||
+        linkedinUrl.trim() === "" ||
+        bio.trim() === ""
+      ) {
         toast.error("All fields are required.");
         return;
       }
-
+      
+      // Generate the public/private key pair
+      const {n,e} = await generateKeyPair();
+      // console.log(formData, publicKey.e, publicKey.n)
       // Image upload process
-      const { public_id, url } = await useUpload({ image, onUploadProgress });
+      const { public_id, url } = await useUpload({ image });
       if (!public_id || !url) {
         toast.error("Error when uploading image");
         return;
       }
 
-      // Send form data to server
+      // Send form data and the public key to the server
       const res = await axiosInstance.post("/users/signup", {
         name,
         email,
         password,
         profile: url,
-         publicId: public_id,
+        publicId: public_id,
+        linkedinUrl,
+        bio,
+        publicKey:{
+          n,e 
+        } , // Send public key to the backend
       });
-
+      
       const data = res.data;
+      // console.log("Data", data)
       if (data.success) {
         toast.success(data.message);
         setImage(null);
-        setFormData({ name: "", password: "", email: "" });
-        setUser(data?.data)
-         setOtpRequested(true)
+        setFormData({ name: "", password: "", email: "", linkedinUrl: "", bio: "" });
+        setUser(data?.data);
+        setOtpRequested(true);
         navigate("/verify-otp");
       } else {
         toast.error(data.message);
       }
     } catch (error) {
-       if (error.response) {
+      console.log(error)
+      if (error.response) {
         const status = error.response.status;
         const message = error.response.data.message || "An error occurred during signup.";
         
@@ -138,7 +157,7 @@ const SignUp = () => {
           </div>
 
           {/* Password Field */}
-          <div className="relative" >
+          <div className="relative">
             <label
               htmlFor="password"
               className="block text-black-700 font-ropaOne mb-2"
@@ -154,52 +173,74 @@ const SignUp = () => {
               placeholder="Enter your password"
               className="w-full p-3 bg-black-300 text-black-800 placeholder-black-600 border border-black-500 focus:ring-rose-500 focus:border-rose-500 rounded"
             />
-              <button
-        type="button"
-        onClick={togglePasswordVisibility}
-        className="absolute text-xl inset-y-0 right-3 top-7 flex items-center text-zinc-400 focus:outline-none"
-      >
-        {showPassword ? <FaEyeSlash /> : <FaEye />} {/* Show different icons based on state */}
-      </button>
+            <button
+              type="button"
+              onClick={togglePasswordVisibility}
+              className="absolute text-xl inset-y-0 right-3 top-7 flex items-center text-zinc-400 focus:outline-none"
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />} {/* Show different icons based on state */}
+            </button>
           </div>
 
-          {/* File Upload Field */}
+          {/* LinkedIn URL Field */}
           <div>
             <label
-              htmlFor="file"
+              htmlFor="linkedininUrl"
               className="block text-black-700 font-ropaOne mb-2"
             >
-              Upload Profile Picture
+              LinkedIn URL
+            </label>
+            <input
+              type="url"
+              id="linkedinUrl"
+              name="linkedinUrl"
+              value={formData.linkedinUrl}
+              onChange={handleChange}
+              placeholder="Enter your LinkedIn URL"
+              className="w-full p-3 bg-black-300 text-black-800 placeholder-black-600 border border-black-500 focus:ring-rose-500 focus:border-rose-500 rounded"
+            />
+          </div>
+
+          {/* Bio Field */}
+          <div>
+            <label
+              htmlFor="bio"
+              className="block text-black-700 font-ropaOne mb-2"
+            >
+              Bio
+            </label>
+            <textarea
+              id="bio"
+              name="bio"
+              maxLength={50}
+              value={formData.bio}
+              onChange={handleChange}
+              placeholder="Write a short bio"
+              className="w-full p-3 bg-black-300 text-black-800 placeholder-black-600 border border-black-500 focus:ring-rose-500 focus:border-rose-500 rounded"
+            />
+          </div>
+
+          {/* File Upload (Image) */}
+          <div>
+            <label
+              htmlFor="image"
+              className="block text-black-700 font-ropaOne mb-2"
+            >
+              Profile Picture
             </label>
             <input
               type="file"
-              id="file"
-              name="file"
-              accept="image/*"
+              id="image"
               onChange={handleImage}
-              className="w-full p-3 bg-black-300 text-black-600 border border-black-500 rounded"
+              className="w-full p-3 bg-black-300 text-black-800 placeholder-black-600 border border-black-500 focus:ring-rose-500 focus:border-rose-500 rounded"
             />
           </div>
 
-          {/* Sign Up Button */}
           <button
             type="submit"
-            className="w-full bg-rose-500 hover:bg-rose-600 text-black-800 font-bold py-2 px-4 rounded"
+            className="w-full py-3 bg-rose-500 text-white text-lg font-semibold rounded-lg hover:bg-rose-600"
           >
             Sign Up
-          </button>
-
-          {/* Continue with Google Button */}
-          <button
-            type="button"
-            className="w-full mt-4 bg-black-400 text-black-800 py-2 px-4 rounded hover:bg-black-500 flex items-center justify-center"
-          >
-            <img
-              src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png"
-              alt="Google Logo"
-              className="w-5 h-5 mr-2"
-            />
-            Continue with Google
           </button>
         </form>
       </div>

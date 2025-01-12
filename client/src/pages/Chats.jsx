@@ -9,8 +9,7 @@ import Chatboxtop from "../components/Chatboxtop";
 import ChatMessagebox from "../components/ChatMessagebox";
 import useSendMessage from "../hooks/useSendMessage";
 import useConversation from "../state/useConversion";
-
-
+import { IoSend } from "react-icons/io5";
 const Chats = () => {
   const { user } = useContext(AppContext);
   const [favourites, setFavourites] = useState([]);
@@ -18,6 +17,7 @@ const Chats = () => {
   const [inputMessage, setInputMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const { selectedConversation, setSelectedConversation } = useConversation();
+
   const getFavourites = async () => {
     if (user) {
       try {
@@ -34,13 +34,21 @@ const Chats = () => {
   useEffect(() => {
     getFavourites();
   }, [user]);
+
   useEffect(() => {
     return setSelectedConversation(null);
   }, [setSelectedConversation]);
+
   const handleSendMessage = async () => {
-    if(inputMessage.trim().length ==0) return;
+    if (inputMessage.trim().length === 0) return;
     await sendMessages(inputMessage);
     setInputMessage("");
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      handleSendMessage();
+    }
   };
 
   if (loading) {
@@ -48,20 +56,19 @@ const Chats = () => {
   }
 
   return (
-    <div className="bg-black-100 text-rose-300 h-screen pt-32 pb-40 w-full flex">
+    <div className="bg-black-100 pt-24 text-rose-300 h-screen md:pt-32 md:pb-40  flex">
       <Friendlist favourites={favourites} />
-
-      <div className="w-3/4 bg-gray-800 flex flex-col">
+      <div className="md:w-3/4   bg-gray-800 flex flex-col">
         {selectedConversation ? (
           <>
-            <Chatboxtop/>
-            <ChatMessagebox/>
-           
-            <div className="p-4 bg-black-200 flex items-center space-x-4">
+            <Chatboxtop />
+            <ChatMessagebox messages={selectedConversation.messages || []} />
+            <div className="md:p-4 p-2 bg-black-200 flex items-center md:space-x-4">
               <input
                 type="text"
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
+                onKeyDown={handleKeyDown} // Enter key functionality
                 placeholder="Type a message"
                 className="flex-1 p-2 rounded bg-gray-800 text-white focus:outline-none"
               />
@@ -69,12 +76,12 @@ const Chats = () => {
                 onClick={handleSendMessage}
                 className="border-rose-500 border-[1px] hover:bg-rose-500 hover:text-white duration-300 transition-all text-gray-300 px-4 py-2 rounded"
               >
-                Send
+                <IoSend />
               </button>
             </div>
           </>
         ) : (
-          <div className="flex-1 p-4 flex items-center justify-center text-gray-500">
+          <div className="flex-1 hidden  p-4 md:flex items-center justify-center text-gray-500">
             Select a contact to start chatting
           </div>
         )}

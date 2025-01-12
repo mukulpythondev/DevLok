@@ -11,6 +11,7 @@ import ProtectedRoute from "./components/ProtectedRoute"; // Now handles both OT
 import About from "./pages/About";
 import Safety from "./pages/Safety";
 import { SocketProvider } from "./context/SocketContext";
+import Profile from "./pages/Profile";
 
 const App = () => {
   return (
@@ -24,6 +25,17 @@ const App = () => {
               <Layout>
                 <Home />
               </Layout>
+            }
+          />
+           <Route
+            path="/profile"
+            element= {
+              <ProtectedRoute
+            element={
+              <Layout>
+                <Profile />
+              </Layout>
+            } />
             }
           />
            <Route
@@ -87,9 +99,8 @@ const App = () => {
             element={
               <ProtectedRoute
                 element={
-                  <Layout>
+                  
                     <VerifyOtp />
-                  </Layout>
                 }
                 requiresOtp={true}
               />

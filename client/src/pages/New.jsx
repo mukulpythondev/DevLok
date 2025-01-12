@@ -39,7 +39,7 @@ const New = () => {
       // Make the API call
       await axiosInstance.patch(`users/${listType}/${id}`, { actionType });
       const currentUser = usersToShow[currentIndex]; 
-      console.log(currentUser)
+      // console.log(currentUser)
       // Show success toast
       const actionMessage = actionType === 'favourite' ? 'favourites' : 'disliked';
       toast.success(`${currentUser?.name} added to ${actionMessage}`);
@@ -87,7 +87,7 @@ const New = () => {
   }, [user]); // Dependency is on 'user'
 
   return (
-    <div className="bg-black-100 h-screen w-screen flex flex-col items-center justify-center">
+    <div className="bg-black-100 min-h-screen w-full flex flex-col items-center justify-center">
       <h1 className="text-white text-3xl mb-6">Find Your Match</h1>
       <div className="relative cursor-pointer w-80 flex flex-col items-center">
         {usersToShow.length > 0 && usersToShow[currentIndex] ? (
@@ -100,14 +100,17 @@ const New = () => {
               preventSwipe={["up", "down"]}
             >
               <div
-                className="w-80 h-96 bg-cover bg-center rounded-lg shadow-lg transition-transform transform hover:scale-105 duration-300 flex items-end"
+                className="w-80 h-96 bg-cover bg-center rounded-lg gap-y-1  shadow-lg transition-transform transform hover:scale-105 duration-300 flex  flex-col justify-end pb-7 items-end"
                 style={{
                   backgroundImage: `url(${usersToShow[currentIndex].profile})`,
                 }}
               >
-                <h3 className="text-lg font-bold text-white p-4 bg-black bg-opacity-50 w-full">
+                <h3 className="text-lg font-bold text-white px-4 bg-black bg-opacity-50 w-full">
                   {usersToShow[currentIndex].name}
                 </h3>
+                <h6 className="text-lg text-white font-semibold px-4  w-full ">
+                - {usersToShow[currentIndex]?.bio?.slice(0,20) || ""}...
+                </h6>
               </div>
             </TinderCard>
             {/* Buttons for Dislike (cross) and Favourite (heart) below the card */}

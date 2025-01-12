@@ -17,8 +17,8 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     if (!user) return;
-
-    const socket = io("http://localhost:8000", {
+    const backendUrl=import.meta.env.VITE_BACKEND_URL;
+    const socket = io(backendUrl, {
       query: {
         userId: user._id,
       },
@@ -27,7 +27,7 @@ export const SocketProvider = ({ children }) => {
 
     // Listen for online users
     socket.on("getOnlineUsers", (users) => {
-      console.log("Users: ", users)
+      // console.log("Users: ", users)
       setOnlineUsers(() => users);
     });
 

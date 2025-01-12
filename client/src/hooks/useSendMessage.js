@@ -7,17 +7,26 @@ const useSendMessage = () => {
   const sendMessages = async (message) => {
     setLoading(true);
     try {
+      
       const res = await axiosInstance.post(
         `/users/message/send/${selectedConversation._id}`,
-        { message }
+        { message}
       );
-      setMessage([...messages, res.data]);
+
+      // Add the original (decrypted) message to the state for display purposes
+      const newMessage = {
+        ...res.data,
+        message, // Replace encrypted message with the original message for local state
+      };
+
+      setMessage([...messages, newMessage]);
       setLoading(false);
     } catch (error) {
-      console.log("Error in send messages", error);
+      console.error("Error in send messages:", error);
       setLoading(false);
     }
   };
+
   return { loading, sendMessages };
 };
 

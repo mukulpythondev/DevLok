@@ -3,11 +3,14 @@ import {
   getAllUserDetails,
   getFavourites,
   getUserDetails,
+  getUserPublicKey,
   Login,
   Logout,
   RefreshAccessToken,
   SignUp,
+  updateProfile,
   updateUserAction,
+  updateUserPublicKey,
   verifyOTP,
 } from "../controllers/userController.js";
 import { verifyJWT } from "../middleware/authMiddleware.js";
@@ -28,4 +31,7 @@ router.post("/refresh-token", RefreshAccessToken);
 
 router.post("/message/send/:id", verifyJWT, sendMessage);
 router.get("/message/get/:id", verifyJWT, getMessage);
+router.get("/public-key", verifyJWT, getUserPublicKey);
+router.put("/public-key", verifyJWT, updateUserPublicKey);
+router.put("/profile",verifyJWT, updateProfile);
 export default router;
