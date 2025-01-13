@@ -11,7 +11,7 @@ const userSchema= new Schema({
         unique:true
     },
     password:{
-        required:true,
+        // required:true,
         type:String
     },
    profile: {
@@ -19,7 +19,7 @@ const userSchema= new Schema({
     type:String
     },
     publicId:{
-        required:true,
+        // required:true,
         type:String
     },
     favourites:[
@@ -45,10 +45,13 @@ const userSchema= new Schema({
         type:String,
         maxlength:50
     },
-    publicKey: {
-        n: { type: String, required: true }, // RSA Modulus (n)
-        e: { type: String, required: true }  // RSA Exponent (e)
-      },
+    googleId:{
+        type:String
+    },
+    // publicKey: {
+    //     n: { type: String, required: true }, // RSA Modulus (n)
+    //     e: { type: String, required: true }  // RSA Exponent (e)
+    //   },
     otp: { type: String }, 
      otpExpiresAt: { type: Date },
      isVerified: {

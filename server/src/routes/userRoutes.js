@@ -1,16 +1,16 @@
 import { Router } from "express";
 import {
+  forgotPassword,
   getAllUserDetails,
   getFavourites,
   getUserDetails,
-  getUserPublicKey,
   Login,
   Logout,
   RefreshAccessToken,
+  resetPassword,
   SignUp,
   updateProfile,
   updateUserAction,
-  updateUserPublicKey,
   verifyOTP,
 } from "../controllers/userController.js";
 import { verifyJWT } from "../middleware/authMiddleware.js";
@@ -28,10 +28,9 @@ router.get("/getfavourite", verifyJWT, getFavourites);
 router.patch("/addtofavourite/:id", verifyJWT, updateUserAction);
 router.patch("/addtodisliked/:id", verifyJWT, updateUserAction);
 router.post("/refresh-token", RefreshAccessToken);
-
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password", resetPassword);
 router.post("/message/send/:id", verifyJWT, sendMessage);
 router.get("/message/get/:id", verifyJWT, getMessage);
-router.get("/public-key", verifyJWT, getUserPublicKey);
-router.put("/public-key", verifyJWT, updateUserPublicKey);
 router.put("/profile",verifyJWT, updateProfile);
 export default router;

@@ -5,7 +5,7 @@ import { ApiResponse } from "../utils/ApiResponse.js"; // Ensure this is defined
 import jwt from "jsonwebtoken";
 import { sendMail } from "../utils/sendmail.js";
 
-const generateAcesstokenAndRefreshtoken=async (userId)=>{
+export const generateAcesstokenAndRefreshtoken=async (userId)=>{
  try {
    const user = await User.findById(userId)
    const accessToken = jwt.sign(
@@ -288,34 +288,34 @@ const getFavourites = async (req, res) => {
     });
   }
 };
-export const getUserPublicKey = async (req, res) => {
-  try {
-    const user = await User.findById(req.user._id).select("publicKey");
-    if (!user) {
-      return res.status(404).json(new ApiResponse(404, {}, "User not found"));
-    }
-    res.status(200).json(new ApiResponse(200, { publicKey: user.publicKey }, "Public key feteched successfully."));
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch public key" });
-  }
-};
-export const updateUserPublicKey = async (req, res) => {
-  try {
-    const { publicKey } = req.body;
+// export const getUserPublicKey = async (req, res) => {
+//   try {
+//     const user = await User.findById(req.user._id).select("publicKey");
+//     if (!user) {
+//       return res.status(404).json(new ApiResponse(404, {}, "User not found"));
+//     }
+//     res.status(200).json(new ApiResponse(200, { publicKey: user.publicKey }, "Public key feteched successfully."));
+//   } catch (error) {
+//     res.status(500).json({ error: "Failed to fetch public key" });
+//   }
+// };
+// export const updateUserPublicKey = async (req, res) => {
+//   try {
+//     const { publicKey } = req.body;
 
-    if (!publicKey) {
-      return res.status(400).json(new ApiResponse(400, {}, "Public key is required."));
-    }
+//     if (!publicKey) {
+//       return res.status(400).json(new ApiResponse(400, {}, "Public key is required."));
+//     }
 
-    const user = await User.findByIdAndUpdate(req.user._id, { publicKey }, { new: true });
-    if (!user) {
-      return res.status(404).json(new ApiResponse(404, {}, "User not found"));
-    }
-    res.status(200).json(new ApiResponse(200, {}, "Public key updated successfully."));
-  } catch (error) {
-    res.status(500).json(new ApiResponse(500, {}, "Failed to update the public key."));
-  }
-};
+//     const user = await User.findByIdAndUpdate(req.user._id, { publicKey }, { new: true });
+//     if (!user) {
+//       return res.status(404).json(new ApiResponse(404, {}, "User not found"));
+//     }
+//     res.status(200).json(new ApiResponse(200, {}, "Public key updated successfully."));
+//   } catch (error) {
+//     res.status(500).json(new ApiResponse(500, {}, "Failed to update the public key."));
+//   }
+// };
 
 
 const updateProfile = async (req, res) => {
@@ -347,6 +347,82 @@ const updateProfile = async (req, res) => {
     return res.status(error.statusCode || 500).json({
       status: error.statusCode || 500,
       message: error.message || "Something went wrong while updating the profile.",
+    });
+  }
+};
+export const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    if (!email || !email.length) {
+      throw new ApiError(400, "Email is required.");
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      throw new ApiError(404, "User not found.");
+    }
+
+    // Check if the account is Google-based
+    if (!user.password) {
+      throw new ApiError(
+        400,
+        "This account was created using Google. Password reset is not allowed for Google accounts."
+      );
+    }
+
+    // Generate OTP and set expiry
+    const otp = generateOTP();
+    user.otp = otp;
+    user.otpExpiry = Date.now() + 300000; // OTP valid for 5 minutes
+    await user.save();
+
+    // Send the OTP via email
+    await sendMail(user.email, otp);
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, null, "OTP has been sent to your email."));
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    return res.status(error.statusCode || 500).json({
+      message: error.message || "Something went wrong in forgot password.",
+    });
+  }
+};
+export const resetPassword = async (req, res) => {
+  const { email, otp, newPassword } = req.body;
+
+  try {
+    if (!email || !otp || !newPassword) {
+      throw new ApiError(400, "Email, OTP, and new password are required.");
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      throw new ApiError(404, "User not found.");
+    }
+
+    // Reuse `verifyOTP` logic to validate the OTP
+    if (user.otp !== otp || user.otpExpiry < Date.now()) {
+      throw new ApiError(400, "Invalid or expired OTP.");
+    }
+
+    // Hash the new password and save it
+    user.password = await hash(newPassword, 10);
+    user.otp = undefined;
+    user.otpExpiry = undefined;
+    await user.save();
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, null, "Password reset successful."));
+  } catch (error) {
+    console.error("Reset password error:", error);
+    return res.status(error.statusCode || 500).json({
+      message: error.message || "Something went wrong in resetting the password.",
     });
   }
 };

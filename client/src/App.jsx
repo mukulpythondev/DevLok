@@ -12,102 +12,121 @@ import About from "./pages/About";
 import Safety from "./pages/Safety";
 import { SocketProvider } from "./context/SocketContext";
 import Profile from "./pages/Profile";
+import ResetPassword from "./components/ResetPassword";
 
 const App = () => {
   return (
     <AppContextProvider>
       <SocketProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <Layout>
-                <Home />
-              </Layout>
-            }
-          />
-           <Route
-            path="/profile"
-            element= {
-              <ProtectedRoute
-            element={
-              <Layout>
-                <Profile />
-              </Layout>
-            } />
-            }
-          />
-           <Route
-            path="/about"
-            element={
-              <Layout>
-                <About />
-              </Layout>
-            }
-          />
-           <Route
-            path="/safety"
-            element={
-              <Layout>
-                <Safety />
-              </Layout>
-            }
-          />
-          <Route
-            path="/login"
-            element={
-              <Layout>
-                <Login />
-              </Layout>
-            }
-          />
-          <Route
-            path="/signup"
-            element={
-              <Layout>
-                <SignUp />
-              </Layout>
-            }
-          />
-          <Route
-            path="/chats"
-            element={
-              <ProtectedRoute
-                element={
-                  <Layout>
-                    <Chats />
-                  </Layout>
-                }
-              />
-            }
-          />
-          <Route
-            path="/new"
-            element={
-              <ProtectedRoute
-                element={
-                  <Layout>
-                    <New />
-                  </Layout>
-                }
-              />
-            }
-          />
-          <Route
-            path="/verify-otp"
-            element={
-              <ProtectedRoute
-                element={
-                  
-                    <VerifyOtp />
-                }
-                requiresOtp={true}
-              />
-            }
-          />
-        </Routes>
-      </BrowserRouter>
+        <BrowserRouter>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <Layout>
+                  <Home />
+                </Layout>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute
+                  element={
+                    <Layout>
+                      <Profile />
+                    </Layout>
+                  }
+                />
+              }
+            />
+            <Route
+              path="/about"
+              element={
+                <Layout>
+                  <About />
+                </Layout>
+              }
+            />
+            <Route
+              path="/safety"
+              element={
+                <Layout>
+                  <Safety />
+                </Layout>
+              }
+            />
+            {/* Protect login and signup routes from authenticated users */}
+            <Route
+              path="/login"
+              element={
+                <ProtectedRoute
+                  element={
+                    <Layout>
+                      <Login />
+                    </Layout>
+                  }
+                  restrictToUnauthenticated={true}
+                />
+              }
+            />
+            <Route
+              path="/signup"
+              element={
+                <ProtectedRoute
+                  element={
+                    <Layout>
+                      <SignUp />
+                    </Layout>
+                  }
+                  restrictToUnauthenticated={true}
+                />
+              }
+            />
+            <Route
+              path="/chats"
+              element={
+                <ProtectedRoute
+                  element={
+                    <Layout>
+                      <Chats />
+                    </Layout>
+                  }
+                />
+              }
+            />
+            <Route
+              path="/new"
+              element={
+                <ProtectedRoute
+                  element={
+                    <Layout>
+                      <New />
+                    </Layout>
+                  }
+                />
+              }
+            />
+            <Route
+              path="/verify-otp"
+              element={
+                <ProtectedRoute
+                  element={<VerifyOtp />}
+                  requiresOtp={true}
+                />
+              }
+            />
+            {/* Forgot Password Route */}
+            <Route
+              path="/forgot-password"
+              element={
+                <Layout>
+                  <ResetPassword />
+                </Layout>
+              }
+            />
+          </Routes>
+        </BrowserRouter>
       </SocketProvider>
     </AppContextProvider>
   );
