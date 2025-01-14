@@ -145,6 +145,7 @@ const Login = async (req, res) => {
           httpOnly: true,
           secure: true,
           maxAge: 24 * 60 * 60 * 1000,
+          sameSite: "None",
           // maxAge: 7 * 24 * 60 * 60 * 1000,
       };
 
