@@ -13,7 +13,7 @@ const useGetMessage = () => {
             `users/message/get/${selectedConversation._id}`
           );
 
-          setMessage(res.data);
+          setMessage(res.data.data);
         } catch (error) {
           console.error("Error in getting messages:", error);
         } finally {

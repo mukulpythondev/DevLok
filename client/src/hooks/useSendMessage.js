@@ -15,7 +15,7 @@ const useSendMessage = () => {
 
       // Add the original (decrypted) message to the state for display purposes
       const newMessage = {
-        ...res.data,
+        ...res.data.data,
         message, // Replace encrypted message with the original message for local state
       };
 

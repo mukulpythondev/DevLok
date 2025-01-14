@@ -1,8 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import axiosInstance from "../api/axiosInstance";
 import { AppContext } from "../context/AppContext";
-import { io } from "socket.io-client";
-import toast from "react-hot-toast";
 import Loader from "../components/Loader";
 import Friendlist from "../components/Friendlist";
 import Chatboxtop from "../components/Chatboxtop";

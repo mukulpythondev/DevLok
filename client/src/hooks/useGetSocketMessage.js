@@ -10,6 +10,7 @@ const useGetSocketMessage = () => {
     socket.on("newMessage", (newMessage) => {
       const notification = new Audio(sound);
       notification.play();
+      console.log("newMessage",newMessage)
       setMessage([...messages, newMessage]);
     });
     return () => {

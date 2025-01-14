@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 const Home = () => {
   return (
     <div
-      style={{ backgroundImage: "url('public/home.webp')" }}
+      style={{ backgroundImage: "url('/home.webp')" }}
       className="flex h-screen items-center justify-center flex-col bg-cover bg-center px-4"
     >
       <h1 className="text-4xl sm:text-5xl text-center w-full sm:w-3/4 md:w-1/2 leading-snug text-white">

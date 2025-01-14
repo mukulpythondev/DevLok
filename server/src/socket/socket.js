@@ -9,14 +9,21 @@ dotenv.config()
 const isProduction =  process.env.NODE_ENV === "production";
 
 const redisConfig = isProduction
-  ? {
-      url: `rediss://default:${process.env.UPSTASH_PASSWORD}@${process.env.UPSTASH_ENDPOINT}:${process.env.UPSTASH_PORT}`,
-    }
+  ? 
+   {
+    host: process.env.REDIS_HOST,      
+    port: process.env.REDIS_PORT,     
+    username: "default", 
+    password: process.env.REDIS_PASSWORD, 
+    tls:false, 
+  }
+  // {
+  //     url: `rediss://default:${process.env.UPSTASH_PASSWORD}@${process.env.UPSTASH_ENDPOINT}:${process.env.UPSTASH_PORT}`,
+  //   }
   : {
       host: "localhost",
       port: 6379,
     };
-
 // Redis Clients
 const client = new Redis(redisConfig.url || redisConfig);
 const pubClient = client.duplicate(); // For Pub/Sub
@@ -76,14 +83,14 @@ export const getReceiverSocketId = async (receiverId) => {
 
 // Socket.IO Logic
 io.on("connection", (socket) => {
-  console.log(`User connected: ${socket.id}`);
+  // console.log(`User connected: ${socket.id}`);
 
   const userId = socket.handshake.query.userId;
   if (userId) {
     // Add user to Redis
     addUser(userId, socket.id)
       .then(() => {
-        console.log(`User ${userId} added with socket ${socket.id}`);
+        // console.log(`User ${userId} added with socket ${socket.id}`);
         // Broadcast updated online users
         notifyOnlineUsers();
       })
@@ -92,11 +99,11 @@ io.on("connection", (socket) => {
 
   // Handle user disconnection
   socket.on("disconnect", () => {
-    console.log(`User disconnected: ${socket.id}`);
+    // console.log(`User disconnected: ${socket.id}`);
     if (userId) {
       removeUser(userId)
         .then(() => {
-          console.log(`User ${userId} removed`);
+          // console.log(`User ${userId} removed`);
           // Broadcast updated online users
           notifyOnlineUsers();
         })
@@ -112,10 +119,8 @@ io.on("connection", (socket) => {
           message,
           createdAt: new Date(),
         });
-        console.log(`Message sent to user ${receiverId}`);
-      } else {
-        console.log(`User ${receiverId} is offline. Message not delivered.`);
-      }
+        // console.log(`Message sent to user ${receiverId}`);
+      } 
     } catch (error) {
       console.error("Error handling sendMessage event:", error);
     }

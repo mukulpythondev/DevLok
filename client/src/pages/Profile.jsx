@@ -7,7 +7,7 @@ import { useUpload } from "../hooks/useUpload";
 
 const Profile = () => {
   const { user, setUser } = useContext(AppContext);
-
+  const [isUploading, setIsUploading] = useState(false); // Track upload status
   const [loading, setLoading] = useState(true); // State for handling loading
   const [formData, setFormData] = useState({
     name: "",
@@ -76,6 +76,7 @@ const Profile = () => {
     }
 
     try {
+      setIsUploading(true);
       let profileUrl = user?.profile || "";
       let publicId = user?.publicId || "";
 
@@ -84,6 +85,7 @@ const Profile = () => {
         const { public_id, url } = await useUpload({ image });
         if (!public_id || !url) {
           toast.error("Error uploading image.");
+          setIsUploading(false);
           return;
         }
         profileUrl = url;
@@ -111,6 +113,9 @@ const Profile = () => {
     } catch (error) {
       console.error(error);
       toast.error("An error occurred while updating the profile.");
+    }
+    finally {
+      setIsUploading(false);
     }
   };
 
@@ -188,10 +193,10 @@ const Profile = () => {
             />
           </div>
           <button
-            type="submit"
+            type="submit"   disabled={isUploading}
             className="w-full py-3 bg-rose-500 text-white text-lg font-semibold rounded-lg hover:bg-rose-600"
           >
-            Update Profile
+              {isUploading ? "Uploading..." : "Update Profile"}
           </button>
         </form>
       </div>

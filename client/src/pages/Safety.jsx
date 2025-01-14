@@ -2,7 +2,7 @@ import React from 'react';
 
 const Safety = () => {
   return (
-    <div className="flex flex-col items-start bg-black-100 w-full px-4 py-10 md:px-20 lg:px-36 h-[100vh] md:h-[83vh] overflow-y-auto pt-24">
+    <div className="flex flex-col items-start bg-black-100 w-full px-4  md:px-20 lg:px-36 h-[100vh] md:h-[83vh] overflow-y-auto pt-36">
       <h1 className="text-3xl md:text-4xl font-bold text-zinc-200 mb-6">Safety Guidelines</h1>
       <p className="text-gray-300 mb-6">
         DevLok Chat ensures your communication is private and secure. Follow these guidelines for a safe experience.
