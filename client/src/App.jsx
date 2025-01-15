@@ -13,6 +13,7 @@ import Safety from "./pages/Safety";
 import { SocketProvider } from "./context/SocketContext";
 import Profile from "./pages/Profile";
 import ResetPassword from "./components/ResetPassword";
+import GoogleRedirect from "./components/GoogleLoader";
 
 const App = () => {
   return (
@@ -26,6 +27,12 @@ const App = () => {
                 <Layout>
                   <Home />
                 </Layout>
+              }
+            />
+             <Route
+              path="/google-redirect"
+              element={
+                  <GoogleRedirect />
               }
             />
             <Route
