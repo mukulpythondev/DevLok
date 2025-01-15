@@ -34,8 +34,10 @@ router.get(
       res.cookie('refreshToken', refreshToken, options);
 
       // Redirect to the desired frontend page
-      const redirectUrl = `${process.env.FRONTEND_URL}/new`;
-      res.redirect(redirectUrl);
+      setTimeout(() => {
+        const redirectUrl = `${process.env.FRONTEND_URL}/new`;
+        res.redirect(redirectUrl);
+      }, 500);
     } catch (error) {
       res.redirect(`${process.env.FRONTEND_URL}/login?error=Something went wrong during Google login.`);
     }

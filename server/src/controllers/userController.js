@@ -105,7 +105,8 @@ const verifyOTP = async (req, res) => {
     const options = {
       httpOnly: true,
       secure: true,
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      maxAge: 24 * 60 * 60 * 1000,
+      sameSite:"None" // 1 day
     };
 
     // Store tokens in cookies and return success response
