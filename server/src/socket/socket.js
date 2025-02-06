@@ -21,7 +21,7 @@ const redisConfig = isProduction
   //     url: `rediss://default:${process.env.UPSTASH_PASSWORD}@${process.env.UPSTASH_ENDPOINT}:${process.env.UPSTASH_PORT}`,
   //   }
   : {
-      host: "localhost",
+      host: "redis-stack", // use localhost without docker
       port: 6379,
     };
 // Redis Clients
